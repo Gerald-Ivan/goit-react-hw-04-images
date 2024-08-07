@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import { useState, useEffect } from 'react'
 import { getAPI } from 'pixabay-api';
 import { SearchBar } from './components/SearchBar/SearchBar';
 import toast, { Toaster } from 'react-hot-toast';
@@ -6,33 +6,48 @@ import { ImageGallery } from './components/ImageGallery/ImageGallery';
 import { LoadMore } from './components/LoadMore/LoadMore';
 import css from './components/App/styles.css'
 import { Loader } from 'components/Loader/Loader';
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
+// import SimpleLightbox from 'simplelightbox';
+// import 'simplelightbox/dist/simple-lightbox.min.css';
 
-export class App extends Component {
-  state = {
-    search: '',
-    page: 1,
-    images: [],
-    isLoading: false,
-    isError: false,
-    isEnd: false,
-  };
+export const App = () => {
+  // state = {
+  //   search: '',
+  //   page: 1,
+  //   images: [],
+  //   isLoading: false,
+  //   isError: false,
+  //   isEnd: false,
+  // };
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isEnd, setIsEnd] = useState(false);
 
-  componentDidUpdate = async (_prevProps, prevState) => {
-    const { search, page } = this.state;
+  // componentDidUpdate = async (_prevProps, prevState) => {
+  //   // const { search, page } = this.state;
+    
+    // if (prevState.search !== search || prevState.page !== page) {
+    //   await fetchImages(search, page);
+  //   } 
+  //   if (prevState.images !== this.state.images) {
+  //     initializeLightbox();
+  //   }
+  // };
+  useEffect(() => {
+    if(search === '') return;
+    (async () => {
+        await fetchImages(search, page);
+    })();
+    
+  }, [search, page]);
+  
 
-    if (prevState.search !== search || prevState.page !== page) {
-      await this.fetchImages(search, page);
-    } 
-    if (prevState.images !== this.state.images) {
-      this.initializeLightbox();
-    }
-  };
-
-  fetchImages = async (search, page) => {
+  const fetchImages = async (search, page) => {
     try {
-      this.setState({ isLoading: true });
+      setIsLoading(true);
+      // this.setState({ isLoading: true });
 
       const fetchedImages = await getAPI(search, page);
 
@@ -52,7 +67,8 @@ export class App extends Component {
       }
 
       if (page * 12 >= totalHits) {
-        this.setState({ isEnd: true });
+      setIsEnd(true);
+        // this.setState({ isEnd: true });
         toast("We're sorry, but you've reached the end of search results.", {
           icon: '👏',
           style: {
@@ -63,48 +79,55 @@ export class App extends Component {
         });
       }
 
-      this.setState(prevState => ({
-        images: [...prevState.images, ...hits],
-      }));
+      setImages(prevImages => [...prevImages, ...hits]);
+      // this.setState(prevState => ({
+      //   images: [...prevState.images, ...hits],
+      // }));
     } catch {
-      this.setState({ isError: true });
+      setIsError(true);
+      // this.setState({ isError: true });
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading(false);
+      // this.setState({ isLoading: false });
     }
   };
 
-  initializeLightbox = () => {
-    if (this.lightbox) {
-      this.lightbox.destroy();
-    }
-    this.lightbox = new SimpleLightbox('.gallery a', {
-      captionsData: 'alt',
-      captionDelay: 250,
-    });
-  };
+  // const initializeLightbox = () => {
+  //   if (this.lightbox) {
+  //     this.lightbox.destroy();
+  //   }
+  //   this.lightbox = new SimpleLightbox('.gallery a', {
+  //     captionsData: 'alt',
+  //     captionDelay: 250,
+  //   });
+  // };
 
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
 
-    const { search } = this.state;
+    // const { search } = this.state;
     const newSearch = e.target.search.value.trim().toLowerCase();
 
     if (newSearch !== search) {
-      this.setState({ search: newSearch, page: 1, images: [] });
+      setSearch(newSearch);
+      setPage(1);
+      setImages([]);
+      // this.setState({ search: newSearch, page: 1, images: [] });
     }
   };
 
-  handleClick = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  const handleClick = () => {
+    setPage((prevPage) => prevPage + 1);
+    // this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  render() {
-    const { images, isLoading, isError, isEnd } = this.state;
+  // render() {
+    // const { images, isLoading, isError, isEnd } = this.state;
     return (
       <div className={css.app}>
-        <SearchBar onSubmit={this.handleSubmit} />
+        <SearchBar onSubmit={handleSubmit} />
         {images.length >= 1 && <ImageGallery photos={images} />}
-        {images.length >= 1 && !isEnd && <LoadMore onClick={this.handleClick} />}
+        {images.length >= 1 && !isEnd && <LoadMore onClick={handleClick} />}
         
         {isError &&
           toast.error(' something went wrong! Reload this page!')}
@@ -113,4 +136,4 @@ export class App extends Component {
       </div>
     );
   }
-}
+// }

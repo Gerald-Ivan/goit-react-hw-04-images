@@ -1,10 +1,9 @@
-import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
-import React, { Component } from 'react'
+import  ImageGalleryItem  from 'components/ImageGalleryItem/ImageGalleryItem';
+import React from 'react'
 import css from './ImageGallery.module.css'
 
-export class ImageGallery extends Component {
-  render() {
-    const { photos } = this.props;
+export const ImageGallery = ({ photos }) => {
+
     return (
       <ul className={css.imageGallery}>
       {photos.map(({ id, webformatURL, largeImageURL, tags }) => (
@@ -18,4 +17,4 @@ export class ImageGallery extends Component {
     </ul>
     )
   }
-}
+

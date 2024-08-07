@@ -1,9 +1,8 @@
-import React, { Component } from 'react'
 import { TailSpin } from 'react-loader-spinner'
 import css from './Loader.module.css'
 
-export class Loader extends Component {
-  render() {
+export const Loader = () => {
+
     return (
       <div className={css.LoaderContainer}>
       <TailSpin
@@ -19,4 +18,4 @@ export class Loader extends Component {
       </div>
     )
   }
-}
+
